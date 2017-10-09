@@ -2438,6 +2438,20 @@ Version 2017-10-08"
   (newline)
   (xah-fly-insert-mode-activate))
 
+(defun xah-fly-cancel-edit ()
+  "Check if org-mode is active and call either org-capture-kill or with-edit-cancel
+Version 2017-10-08"
+  (interactive)
+  (if (equal major-mode 'org-mode)
+	  (org-capture-kill)
+	(with-editor-cancel nil)))
+
+(defun pdflatex ()
+  "Runs pdflatex on file behind current buffer.
+Version 2017-10-08"
+  (interactive)
+  (shell-command (concat "pdflatex " (buffer-file-name))))
+
 
 
 (defvar xah--dvorak-to-qwerty-kmap
@@ -2896,8 +2910,14 @@ Version 2017-01-21"
    ("t" . xref-find-definitions)
    ("n" . xref-pop-marker-stack)
    ("x" . compile)
+   ("q" . pdflatex)
    ("p" . gdb)
-   ("y" . pdb)))
+   ("y" . pdb)
+   ("," . org-capture)
+   ("m" . org-refile)
+   ("'" . with-editor-finish)
+   ("f" . xah-fly-cancel-edit)
+   ("j" . org-ctrl-c-ctrl-c)))
 
 (xah-fly--define-keys
  (define-prefix-command 'xah-fly-leader-key-map)
@@ -3235,7 +3255,7 @@ Version 2017-01-21"
      ("i" . xah-delete-current-text-block)
      ("j" . xah-copy-line-or-region)
      ("k" . xah-paste-or-paste-previous)
-     ("l" . xah-fly-insert-mode-activate-space-before)
+     ("l" . xah-fly-insert-mode-activate-end-of-line-before)
      ("m" . xah-backward-left-bracket)
      ("n" . forward-char)
      ("o" . open-line-insert)
@@ -3394,6 +3414,12 @@ Version 2017-07-07"
   "Insert a space, then activate insertion mode."
   (interactive)
   (insert " ")
+  (xah-fly-insert-mode-activate))
+
+(defun xah-fly-insert-mode-activate-end-of-line-before ()
+  "Go to end of line, then activate insertion mode."
+  (interactive)
+  (end-of-line)
   (xah-fly-insert-mode-activate))
 
 (defun xah-fly-insert-mode-activate-space-after ()
