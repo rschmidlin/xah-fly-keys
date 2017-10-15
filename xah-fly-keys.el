@@ -2771,7 +2771,7 @@ Version 2017-01-21"
    ("d" . narrow-to-page)
    ("e" . eshell)
    ("f" . nil)
-   ("g" . nil)
+   ("g" . dash-at-point-with-docset)
    ("h" . widen)
    ("i" . make-frame-command)
    ("j" . flyspell-buffer)
@@ -2789,7 +2789,7 @@ Version 2017-01-21"
    ("v" . nil)
    ("w" . eww)
    ("x" . save-some-buffers)
-   ("y" . nil)
+   ("y" . dash-at-point)
    ("z" . abort-recursive-edit)))
 
 (xah-fly--define-keys
