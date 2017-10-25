@@ -2921,7 +2921,8 @@ Version 2017-01-21"
    ("m" . org-refile)
    ("'" . with-editor-finish)
    ("f" . xah-fly-cancel-edit)
-   ("j" . org-ctrl-c-ctrl-c)))
+   ("j" . org-ctrl-c-ctrl-c)
+   ("k" . org-ctrl-c-minus)))
 
 (xah-fly--define-keys
  (define-prefix-command 'xah-fly-leader-key-map)
