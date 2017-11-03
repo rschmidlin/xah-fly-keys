@@ -2905,7 +2905,7 @@ Version 2017-01-21"
  (define-prefix-command 'xah-fly-comma-keymap)
  '(
    ("i" . magit-status)
-   ("u" . projectile-find-file)
+   ("u" . ggtags-find-file)
    ("e" . projectile-find-dir)
    ("t" . xref-find-definitions)
    ("n" . xref-pop-marker-stack)
