@@ -169,6 +169,15 @@ Version 2017-07-07"
   (xah-fly-insert-mode-activate)
   (open-line 1))
 
+(defun open-line-insert ()
+  "Opens a line below, moves the point and activate insert mode. 
+Version 2017-10-08"
+  (interactive)
+  (end-of-line)
+  (newline)
+  (xah-fly-insert-mode-activate)
+  (indent-for-tab-command))
+
 (defun xah-fly-insert-mode-activate-space-before ()
   "Insert a space, then activate insertion mode."
   (interactive)

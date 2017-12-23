@@ -2299,14 +2299,6 @@ Version 2017-01-29"
   (interactive)
   (describe-function major-mode))
 
-(defun open-line-insert ()
-  "Opens a line below, moves the point and activate insert mode. 
-Version 2017-10-08"
-  (interactive)
-  (end-of-line)
-  (newline)
-  (xah-fly-insert-mode-activate))
-
 (defun xah-fly-cancel-edit ()
   "Check if org-mode is active and call either org-capture-kill or with-edit-cancel
 Version 2017-10-08"
