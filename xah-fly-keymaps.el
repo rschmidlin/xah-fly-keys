@@ -1,6 +1,12 @@
 (require 'xah-fly-commands)
 (require 'xah-fly-layouts)
 
+(defvar xah-fly-key-map (make-sparse-keymap) "Keybinding for `xah-fly-keys' minor mode.")
+
+(defvar xah-fly-use-control-key t "if nil, do not bind any control key. When t, standard keys for open, close, paste, are bound.")
+(defvar xah-fly-use-meta-key t "if nil, do not bind any meta key.")
+
+
 (defun xah-fly--define-keys (@keymap-name @key-cmd-alist)
   "Map `define-key' over a alist @key-cmd-alist.
 Example usage:

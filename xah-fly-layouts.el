@@ -1,3 +1,8 @@
+(defvar
+  xah-fly-key--current-layout
+  nil
+  "The current keyboard layout. Use `xah-fly-keys-set-layout' to set the layout."
+  )
 
 (defvar xah--dvorak-to-qwerty-kmap
   '(("." . "e")

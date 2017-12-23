@@ -107,33 +107,14 @@
 (require 'dired) ; in emacs
 (require 'dired-x) ; in emacs
 (require 'ido) ; in emacs
+(require 'xah-fly-layouts)
 (require 'xah-fly-keymaps)
 
 (when (version<= emacs-version "26.0.50"  )
   (defalias 'global-display-line-numbers-mode 'linum-mode ))
 
-(defvar
-  xah-fly-key--current-layout
-  nil
-  "The current keyboard layout. Use `xah-fly-keys-set-layout' to set the layout."
-  )
-
-(require 'xah-fly-layouts)
-
 (defvar xah-fly-command-mode-activate-hook nil "Hook for `xah-fly-command-mode-activate'")
 (defvar xah-fly-insert-mode-activate-hook nil "Hook for `xah-fly-insert-mode-activate'")
-
-(defvar xah-fly-use-control-key t "if nil, do not bind any control key. When t, standard keys for open, close, paste, are bound.")
-
-(defvar xah-fly-use-meta-key t "if nil, do not bind any meta key.")
-
-;; keymaps
-(defvar xah-fly-swapped-1-8-and-2-7-p nil "If non-nil, it means keys 1 and 8 are swapped, and 2 and 7 are swapped. See: http://xahlee.info/kbd/best_number_key_layout.html")
-
-(defvar xah-fly-key-map (make-sparse-keymap) "Keybinding for `xah-fly-keys' minor mode.")
-
-(defvar xah-fly-insert-state-q t "Boolean value. true means insertion mode is on.")
-(setq xah-fly-insert-state-q t)
 
 (defun xah-fly-keys-set-layout (@layout)
   "Set a keyboard layout.
@@ -141,7 +122,13 @@ Possible value should be \"qwerty\", \"dvorak\" or \"workman\"
 Version 2017-01-21"
   (interactive)
   (setq xah-fly-key--current-layout @layout)
-  (load "xah-fly-keys"))
+  (load "xah-fly-keymaps"))
+
+;; keymaps
+(defvar xah-fly-swapped-1-8-and-2-7-p nil "If non-nil, it means keys 1 and 8 are swapped, and 2 and 7 are swapped. See: http://xahlee.info/kbd/best_number_key_layout.html")
+
+(defvar xah-fly-insert-state-q t "Boolean value. true means insertion mode is on.")
+(setq xah-fly-insert-state-q t)
 
 (defun xah-fly-mode-toggle ()
   "Switch between {insertion, command} modes."
