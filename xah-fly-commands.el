@@ -139,127 +139,6 @@ Version 2015-06-15"
   (interactive)
   (re-search-forward "=+" nil t))
 
-(defun xah-backward-equal-sign ()
-  "Move cursor to previous occurrence of equal sign 「=」.
-URL `http://ergoemacs.org/emacs/emacs_jump_to_punctuations.html'
-Version 2015-06-15"
-  (interactive)
-  (when (re-search-backward "=+" nil t)
-    (while (search-backward "=" (- (point) 1) t)
-      (left-char))))
-
-(defun xah-forward-comma-sign ()
-  "Move cursor to the next occurrence of comma 「,」.
-Version 2016-01-19"
-  (interactive)
-  (re-search-forward ",+" nil t))
-
-(defun xah-backward-comma-sign ()
-  "Move cursor to previous occurrence of comma sign 「,」.
-Version 2016-01-19"
-  (interactive)
-  (when (re-search-backward ",+" nil t)
-    (while (search-backward "," (- (point) 1) t)
-      (left-char))))
-
-(defun xah-forward-quote ()
-  "Move cursor to the next occurrence of \".
-If there are consecutive quotes of the same char, keep moving until none.
-Returns `t' if found, else `nil'.
-URL `http://ergoemacs.org/emacs/emacs_navigating_keys_for_brackets.html'
-Version 2016-07-23"
-  (interactive)
-  (if (re-search-forward "\\\"+" nil t)
-      t
-    (progn
-      (message "No more quotes after cursor..")
-      nil)))
-
-(defun xah-forward-quote-twice ()
-  "Call `xah-forward-quote' twice.
-Returns `t' if found, else `nil'.
-URL `http://ergoemacs.org/emacs/emacs_navigating_keys_for_brackets.html'
-Version 2016-07-23"
-  (interactive)
-  (when (xah-forward-quote)
-    (xah-forward-quote)))
-
-(defun xah-forward-quote-smart ()
-  "Move cursor to the current or next string quote.
-Place cursor at the position after the left quote.
-Repeated call will find the next string.
-URL `http://ergoemacs.org/emacs/emacs_navigating_keys_for_brackets.html'
-Version 2016-11-22"
-  (interactive)
-  (let (($pos (point)))
-    (if (nth 3 (syntax-ppss))
-        (progn
-          (backward-up-list 1 'ESCAPE-STRINGS 'NO-SYNTAX-CROSSING)
-          (forward-sexp)
-          (re-search-forward "\\\"" nil t))
-      (progn (re-search-forward "\\\"" nil t)))
-    (when (<= (point) $pos)
-      (progn (re-search-forward "\\\"" nil t)))))
-
-(defun xah-backward-quote ()
-  "Move cursor to the previous occurrence of \".
-If there are consecutive quotes of the same char, keep moving until none.
-Returns `t' if found, else `nil'.
-URL `http://ergoemacs.org/emacs/emacs_navigating_keys_for_brackets.html'
-Version 2016-07-23"
-  (interactive)
-  (if (re-search-backward "\\\"+" nil t)
-      (when (char-before) ; isn't nil, at beginning of buffer
-        (while (char-equal (char-before) (char-after))
-          (left-char)
-          t))
-    (progn
-      (message "No more quotes before cursor.")
-      nil)))
-
-(defun xah-forward-dot-comma ()
-  "Move cursor to the next occurrence of 「.」 「,」 「;」.
-URL `http://ergoemacs.org/emacs/emacs_jump_to_punctuations.html'
-Version 2015-03-24"
-  (interactive)
-  (re-search-forward "\\.+\\|,+\\|;+" nil t))
-
-(defun xah-backward-dot-comma ()
-  "Move cursor to the previous occurrence of 「.」 「,」 「;」
-URL `http://ergoemacs.org/emacs/emacs_jump_to_punctuations.html'
-Version 2015-03-24"
-  (interactive)
-  (re-search-backward "\\.+\\|,+\\|;+" nil t))
-
-;; (defun goto-point-min ()
-;;   "Goto the beginning of buffer.
-;; This is different from `beginning-of-buffer'
-;; because that marks the previous position."
-;;   (interactive)
-;;   (goto-char (point-min))
-;; )
-
-;; (defun goto-point-max ()
-;;   "Goto the end of buffer.
-;; This is different from `end-of-buffer'
-;; because that marks the previous position."
-;;   (interactive)
-;;   (goto-char (point-max))
-;; )
-
-;; (defun xah-forward-space ()
-;;   "Move cursor to the next occurrence of white space."
-;;   (interactive)
-;;   (re-search-forward "[ \t\n]+" nil t))
-
-;; (defun xah-backward-space ()
-;;   "Move cursor to the next occurrence of white space."
-;;   (interactive)
-;;   ;; (skip-chars-backward "^ \t\n")
-;;   ;; (re-search-backward "[ \t\n]+" nil t)
-;;   (posix-search-backward "[ \t\n]+" nil t)
-;;   )
-
 
 ;; editing commands
 
@@ -470,30 +349,6 @@ Version 2017-07-02"
     (push-mark (point) t)
     (goto-char (- $p0 2))))
 
-(defun xah-delete-forward-bracket-pairs ( &optional @delete-inner-text-p)
-  "Delete the matching brackets/quotes to the right of cursor.
-If @delete-inner-text-p is true, also delete the inner text.
-
-After the command, mark is set at the left matching bracket position, so you can `exchange-point-and-mark' to select it.
-
-This command assumes the char to the right of point is a left bracket or quote, and have a matching one after.
-
-What char is considered bracket or quote is determined by current syntax table.
-
-URL `http://ergoemacs.org/emacs/emacs_delete_backward_char_or_bracket_text.html'
-Version 2017-07-02"
-  (interactive)
-  (if @delete-inner-text-p
-      (progn
-        (mark-sexp)
-        (kill-region (region-beginning) (region-end)))
-    (let (($pt (point)))
-      (forward-sexp)
-      (delete-char -1)
-      (push-mark (point) t)
-      (goto-char $pt)
-      (delete-char 1))))
-
 (defun xah-toggle-letter-case ()
   "Toggle the letter case of current word or text selection.
 Always cycle in this order: Init Caps, ALL CAPS, all lower.
@@ -529,18 +384,6 @@ Version 2017-04-19"
 ;; test_case some
 ;; test-case
 ;; tes▮t-case
-
-(defun xah-toggle-previous-letter-case ()
-  "Toggle the letter case of the letter to the left of cursor.
-URL `http://ergoemacs.org/emacs/modernization_upcase-word.html'
-Version 2015-12-22"
-  (interactive)
-  (let ((case-fold-search nil))
-    (left-char 1)
-    (cond
-     ((looking-at "[[:lower:]]") (upcase-region (point) (1+ (point))))
-     ((looking-at "[[:upper:]]") (downcase-region (point) (1+ (point)))))
-    (right-char)))
 
 (defun xah-shrink-whitespaces ()
   "Remove whitespaces around cursor to just one or none.
@@ -609,26 +452,6 @@ Version 2017-01-08"
         (fill-region $p1 $p2)))
     (put this-command 'compact-p (not $compact-p))))
 
-(defun xah-unfill-paragraph ()
-  "Replace newline chars in current paragraph by single spaces.
-This command does the inverse of `fill-paragraph'.
-
-URL `http://ergoemacs.org/emacs/emacs_unfill-paragraph.html'
-Version 2016-07-13"
-  (interactive)
-  (let ((fill-column most-positive-fixnum))
-    (fill-paragraph)))
-
-(defun xah-unfill-region (@begin @end)
-  "Replace newline chars in region by single spaces.
-This command does the inverse of `fill-region'.
-
-URL `http://ergoemacs.org/emacs/emacs_unfill-paragraph.html'
-Version 2016-07-13"
-  (interactive "r")
-  (let ((fill-column most-positive-fixnum))
-    (fill-region @begin @end)))
-
 (defun xah-reformat-lines ( &optional @length)
   "Reformat current text block into 1 long line or multiple short lines.
 When there is a text selection, act on the selection, else, act on a text block separated by blank lines.
@@ -673,64 +496,6 @@ Version 2017-07-15"
             (xah-reformat-to-multi-lines $p1 $p2 @length)
           (xah-reformat-whitespaces-to-one-space $p1 $p2)))
       (put this-command 'is-longline-p (not is-longline-p)))))
-
-(defun xah-reformat-whitespaces-to-one-space (@begin @end)
-  "Replace whitespaces by one space.
-
-URL `http://ergoemacs.org/emacs/emacs_reformat_lines.html'
-Version 2017-01-11"
-  (interactive "r")
-  (save-excursion
-    (save-restriction
-      (narrow-to-region @begin @end)
-      (goto-char (point-min))
-      (while
-          (search-forward "\n" nil "move")
-        (replace-match " "))
-      (goto-char (point-min))
-      (while
-          (search-forward "\t" nil "move")
-        (replace-match " "))
-      (goto-char (point-min))
-      (while
-          (re-search-forward "  +" nil "move")
-        (replace-match " ")))))
-
-(defun xah-reformat-to-multi-lines ( &optional @begin @end @min-length)
-  "Replace spaces by a newline at places so lines are not long.
-When there is a text selection, act on the selection, else, act on a text block separated by blank lines.
-
-If `universal-argument' is called first, use the number value for min length of line. By default, it's 70.
-
-URL `http://ergoemacs.org/emacs/emacs_reformat_lines.html'
-Version 2017-07-06"
-  (interactive )
-  (let (
-        $p1 $p2
-        ($blanks-regex "\n[ \t]*\n")
-        ($minlen (if @min-length
-                     @min-length
-                   (if current-prefix-arg (prefix-numeric-value current-prefix-arg) 70 ))))
-    (if (and  @begin @end)
-        (setq $p1 @begin $p2 @end)
-      (if (region-active-p)
-          (progn (setq $p1 (region-beginning) $p2 (region-end)))
-        (save-excursion
-          (if (re-search-backward $blanks-regex nil "move")
-              (progn (re-search-forward $blanks-regex)
-                     (setq $p1 (point)))
-            (setq $p1 (point)))
-          (if (re-search-forward $blanks-regex nil "move")
-              (progn (re-search-backward $blanks-regex)
-                     (setq $p2 (point)))
-            (setq $p2 (point))))))
-    (save-restriction
-      (narrow-to-region $p1 $p2)
-      (goto-char (point-min))
-      (while
-          (re-search-forward " +" nil "move")
-        (when (> (- (point) (line-beginning-position)) $minlen)
-          (replace-match "\n" ))))))
 
 (defun xah-space-to-newline ()
   "Replace space sequence to a newline char.
@@ -880,55 +645,6 @@ Version 2017-01-11"
         (while (search-forward "\"" nil t)
           (replace-match "\\\"" "FIXEDCASE" "LITERAL")))))
 
-(defun xah-unescape-quotes (@begin @end)
-  "Replace  「\\\"」 by 「\"」 in current line or text selection.
-See also: `xah-escape-quotes'
-
-URL `http://ergoemacs.org/emacs/elisp_escape_quotes.html'
-Version 2017-01-11"
-  (interactive
-   (if (use-region-p)
-       (list (region-beginning) (region-end))
-     (list (line-beginning-position) (line-end-position))))
-  (save-excursion
-    (save-restriction
-      (narrow-to-region @begin @end)
-      (goto-char (point-min))
-      (while (search-forward "\\\"" nil t)
-        (replace-match "\"" "FIXEDCASE" "LITERAL")))))
-
-(defun xah-dired-rename-space-to-underscore ()
-  "In dired, rename current or marked files by replacing space to underscore _.
-If not in `dired', do nothing.
-URL `http://ergoemacs.org/emacs/elisp_dired_rename_space_to_underscore.html'
-Version 2017-01-02"
-  (interactive)
-  (require 'dired-aux)
-  (if (equal major-mode 'dired-mode)
-      (progn
-        (mapc (lambda (x)
-                (when (string-match " " x )
-                  (dired-rename-file x (replace-regexp-in-string " " "_" x) nil)))
-              (dired-get-marked-files ))
-        (revert-buffer))
-    (user-error "Not in dired")))
-
-(defun xah-dired-rename-space-to-hyphen ()
-  "In dired, rename current or marked files by replacing space to hyphen -.
-If not in `dired', do nothing.
-URL `http://ergoemacs.org/emacs/elisp_dired_rename_space_to_underscore.html'
-Version 2016-12-22"
-  (interactive)
-  (require 'dired-aux)
-  (if (equal major-mode 'dired-mode)
-      (progn
-        (mapc (lambda (x)
-                (when (string-match " " x )
-                  (dired-rename-file x (replace-regexp-in-string " " "_" x) nil)))
-              (dired-get-marked-files ))
-        (revert-buffer))
-    (user-error "Not in dired")))
-
 (defun xah-cycle-hyphen-underscore-space ( &optional @begin @end )
   "Cycle {underscore, space, hypen} chars in selection or inside quote/bracket or line.
 When called repeatedly, this command cycles the {“_”, “-”, “ ”} characters, in that order.
@@ -992,19 +708,6 @@ Version 2017-01-27"
         (setq deactivate-mark nil))
       (put 'xah-cycle-hyphen-underscore-space 'state (% (+ $nowState 1) $length)))))
 
-(defun xah-underscore-to-space-region (@begin @end)
-  "Change underscore char to space.
-URL `http://ergoemacs.org/emacs/elisp_change_space-hyphen_underscore.html'
-Version 2017-01-11"
-  (interactive "r")
-  (save-excursion
-    (save-restriction
-      (narrow-to-region @begin @end)
-      (goto-char (point-min))
-      (while
-          (re-search-forward "_" (point-max) "move")
-        (replace-match " " "FIXEDCASE" "LITERAL")))))
-
 (defun xah-copy-file-path (&optional @dir-path-only-p)
   "Copy the current buffer's file path or dired path to `kill-ring'.
 Result is full path.
@@ -1036,25 +739,6 @@ Version 2017-09-01"
          (message "File path copied: 「%s」" $fpath)
          $fpath )))))
 
-;; (defun xah-delete-text-block ()
-;;   "Delete current/next text block or selection, and also copy to `kill-ring'.
-
-;; A “block” is text between blank lines.
-;; The “current block” is the block the cursor is at.
-;; If cursor is not on a block, deletes the next block.
-;; If there's a text selection, just delete that region.
-
-;; URL `http://ergoemacs.org/emacs/emacs_delete_block.html'
-;; Version 2016-10-10"
-;;   (interactive)
-;;   (if (use-region-p)
-;;       (kill-region (region-beginning) (region-end))
-;;     (progn
-;;       (beginning-of-line)
-;;       (if (re-search-forward "[[:graph:]]" (line-end-position) "move")
-;;           (xah-delete-current-text-block)
-;;         (when (re-search-forward "[[:graph:]]" )
-;;           (xah-delete-current-text-block))))))
 
 (defun xah-delete-current-text-block ()
   "Delete the current text block or selection, and copy to `kill-ring'.
@@ -1131,16 +815,6 @@ Version 2015-12-08"
     (delete-region (region-beginning) (region-end)))
   (insert-register ?1 t))
 
-(defun xah-copy-rectangle-to-kill-ring (@begin @end)
-  "Copy region as column (rectangle region) to `kill-ring'
-See also: `kill-rectangle', `copy-to-register'.
-URL `http://ergoemacs.org/emacs/emacs_copy_rectangle_text_to_clipboard.html'
-version 2016-07-17"
-  ;; extract-rectangle suggested by YoungFrog, 2012-07-25
-  (interactive "r")
-  (require 'rect)
-  (kill-new (mapconcat 'identity (extract-rectangle @begin @end) "\n")))
-
 (defun xah-upcase-sentence ()
   "Upcase first letters of sentences of current text block or selection.
 
@@ -1195,65 +869,6 @@ Version 2017-04-30"
             )
 
           (goto-char (point-min)))))))
-
-(defun xah-title-case-region-or-line (@begin @end)
-  "Title case text between nearest brackets, or current line, or text selection.
-Capitalize first letter of each word, except words like {to, of, the, a, in, or, and, …}. If a word already contains cap letters such as HTTP, URL, they are left as is.
-
-When called in a elisp program, @begin @end are region boundaries.
-URL `http://ergoemacs.org/emacs/elisp_title_case_text.html'
-Version 2017-01-11"
-  (interactive
-   (if (use-region-p)
-       (list (region-beginning) (region-end))
-     (let (
-           $p1
-           $p2
-           ($skipChars "^\"<>(){}[]“”‘’‹›«»「」『』【】〖〗《》〈〉〔〕"))
-       (progn
-         (skip-chars-backward $skipChars (line-beginning-position))
-         (setq $p1 (point))
-         (skip-chars-forward $skipChars (line-end-position))
-         (setq $p2 (point)))
-       (list $p1 $p2))))
-  (let* (
-         ($strPairs [
-                     [" A " " a "]
-                     [" And " " and "]
-                     [" At " " at "]
-                     [" As " " as "]
-                     [" By " " by "]
-                     [" Be " " be "]
-                     [" Into " " into "]
-                     [" In " " in "]
-                     [" Is " " is "]
-                     [" It " " it "]
-                     [" For " " for "]
-                     [" Of " " of "]
-                     [" Or " " or "]
-                     [" On " " on "]
-                     [" Via " " via "]
-                     [" The " " the "]
-                     [" That " " that "]
-                     [" To " " to "]
-                     [" Vs " " vs "]
-                     [" With " " with "]
-                     [" From " " from "]
-                     ["'S " "'s "]
-                     ["'T " "'t "]
-                     ]))
-    (save-excursion
-      (save-restriction
-        (narrow-to-region @begin @end)
-        (upcase-initials-region (point-min) (point-max))
-        (let ((case-fold-search nil))
-          (mapc
-           (lambda ($x)
-             (goto-char (point-min))
-             (while
-                 (search-forward (aref $x 0) nil t)
-               (replace-match (aref $x 1) "FIXEDCASE" "LITERAL")))
-           $strPairs))))))
 
 
 ;; insertion commands
@@ -1325,15 +940,6 @@ version 2016-12-18"
        )
       (t
        (format-time-string "%Y-%m-%d"))))))
-
-;; (defun xah-current-date-time-string ()
-;;   "Returns current date-time string in full ISO 8601 format.
-;; Example: 「2012-04-05T21:08:24-07:00」.
-
-;; Note, for the time zone offset, both the formats 「hhmm」 and 「hh:mm」 are valid ISO 8601. However, Atom Webfeed spec seems to require 「hh:mm」."
-;;   (concat
-;;    (format-time-string "%Y-%m-%dT%T")
-;;    ((lambda ($x) (format "%s:%s" (substring $x 0 3) (substring $x 3 5))) (format-time-string "%z"))))
 
 (defun xah-insert-bracket-pair (@left-bracket @right-bracket &optional @wrap-method)
   "Insert brackets around selection, word, at point, and maybe move cursor in between.
@@ -1437,22 +1043,10 @@ Version 2017-01-17"
 (defun xah-insert-ascii-single-quote () (interactive) (xah-insert-bracket-pair "'" "'") )
 (defun xah-insert-emacs-quote () (interactive) (xah-insert-bracket-pair "`" "'") )
 (defun xah-insert-corner-bracket「」 () (interactive) (xah-insert-bracket-pair "「" "」" ) )
-(defun xah-insert-white-corner-bracket『』 () (interactive) (xah-insert-bracket-pair "『" "』") )
 (defun xah-insert-angle-bracket〈〉 () (interactive) (xah-insert-bracket-pair "〈" "〉") )
 (defun xah-insert-double-angle-bracket《》 () (interactive) (xah-insert-bracket-pair "《" "》") )
-(defun xah-insert-white-lenticular-bracket〖〗 () (interactive) (xah-insert-bracket-pair "〖" "〗") )
 (defun xah-insert-black-lenticular-bracket【】 () (interactive) (xah-insert-bracket-pair "【" "】") )
 (defun xah-insert-tortoise-shell-bracket〔〕 () (interactive) (xah-insert-bracket-pair "〔" "〕" ) )
-
-(defun xah-insert-hyphen ()
-  "Insert a HYPHEN-MINUS character."
-  (interactive)
-  (insert "-"))
-
-(defun xah-insert-low-line ()
-  "Insert a LOW LINE character."
-  (interactive)
-  (insert "_"))
 
 (defun xah-insert-string-assignment ()
   "Insert space before cursor"
@@ -1460,62 +1054,10 @@ Version 2017-01-17"
   (progn (insert "=\"\"")
          (left-char)))
 
-(defun xah-insert-space-before ()
-  "Insert space before cursor"
-  (interactive)
-  (insert " "))
-
-(defun xah-insert-space-after ()
-  "Insert space after cursor"
-  (interactive)
-  (insert " ")
-  (left-char))
-
 (defun xah-insert-form-feed ()
   "Insert a form feed char (codepoint 12)"
   (interactive)
   (insert "\n\n"))
-
-(defun xah-insert-column-counter (@n)
-  "Insert a sequence of numbers vertically.
-
- (this command is similar to emacs 24.x's `rectangle-number-lines'.)
-
-For example, if your text is:
-
-a b
-c d
-e f
-
-and your cursor is after “a”, then calling this function with argument
-3 will change it to become:
-
-a1 b
-c2 d
-e3 f
-
-If there are not enough existing lines after the cursor
-when this function is called, it aborts at the last line.
-
-This command is conveniently used together with `kill-rectangle' and `string-rectangle'."
-  (interactive "nEnter the max integer: ")
-  (let (($i 1) $colpos )
-    (setq $colpos (- (point) (line-beginning-position)))
-    (while (<= $i @n)
-      (insert (number-to-string $i))
-      (forward-line) (beginning-of-line) (forward-char $colpos)
-      (setq $i (1+ $i)))))
-
-(defun xah-insert-alphabets-az (&optional @use-uppercase-p)
-  "Insert letters a to z vertically.
-If `universal-argument' is called first, use CAPITAL letters.
-
-URL `http://ergoemacs.org/emacs/emacs_insert-alphabets.html'
-Version 2015-11-06"
-  (interactive "P")
-  (let (($startChar (if @use-uppercase-p 65 97 )))
-    (dotimes ($i 26)
-      (insert (format "%c\n" (+ $startChar $i))))))
 
 (defvar xah-unicode-list nil "Associative list of Unicode symbols. First element is a Unicode character, second element is a string used as key shortcut in `ido-completing-read'")
 (setq xah-unicode-list
@@ -1550,19 +1092,6 @@ Version 2015-11-06"
 
 ;; text selection
 
-(defun xah-select-current-block ()
-  "Select the current block of text between blank lines.
-
-URL `http://ergoemacs.org/emacs/modernization_mark-word.html'
-Version 2017-07-02"
-  (interactive)
-  (progn
-    (skip-chars-forward " \n\t")
-    (when (re-search-backward "\n[ \t]*\n" nil "move")
-      (re-search-forward "\n[ \t]*\n"))
-    (push-mark (point) t t)
-    (re-search-forward "\n[ \t]*\n" nil "move")))
-
 (defun xah-select-block ()
   "Select the current/next block of text between blank lines.
 If region is active, extend selection downward by block.
@@ -1581,17 +1110,6 @@ Version 2016-07-22"
   (interactive)
   (end-of-line)
   (set-mark (line-beginning-position)))
-
-(defun xah-select-line ()
-  "Select current line. If region is active, extend selection downward by line.
-URL `http://ergoemacs.org/emacs/modernization_mark-word.html'
-Version 2016-07-22"
-  (interactive)
-  (if (region-active-p)
-      (progn
-        (forward-line 1)
-        (end-of-line))
-    (xah-select-current-line)))
 
 (defun xah-extend-selection ()
   "Select the current word, bracket/quote expression, or expand selection.
@@ -1735,19 +1253,6 @@ Version 2016-10-11"
     (aset buffer-display-table ?\^L
           (vconcat (make-list 70 (make-glyph-code ?─ 'font-lock-comment-face))))
     (redraw-frame)))
-
-(defun xah-user-buffer-q ()
-  "Return t if current buffer is a user buffer, else nil.
-Typically, if buffer name starts with *, it's not considered a user buffer.
-This function is used by buffer switching command and close buffer command, so that next buffer shown is a user buffer.
-You can override this function to get your idea of “user buffer”.
-Version 2016-06-18"
-  (interactive)
-  (cond
-   ((string-equal "*" (substring (buffer-name) 0 1)) nil)
-   ((string-equal major-mode "dired-mode") nil)
-   ((string-equal major-mode "eww-mode") nil)
-   (t t)))
 
 (defun xah-next-user-buffer ()
   "Switch to the next user buffer.
@@ -2020,25 +1525,6 @@ Version 2017-09-24"
               (shell-command $cmd-str "*xah-run-current-file output*" ))
           (message "No recognized program file suffix for this file."))))))
 
-(defun xah-clean-empty-lines ()
-  "Replace repeated blank lines to just 1.
-Works on whole buffer or text selection, respects `narrow-to-region'.
-
-URL `http://ergoemacs.org/emacs/elisp_compact_empty_lines.html'
-Version 2017-09-22"
-  (interactive)
-  (let ($begin $end)
-    (if (region-active-p)
-        (setq $begin (region-beginning) $end (region-end))
-      (setq $begin (point-min) $end (point-max)))
-    (save-excursion
-      (save-restriction
-        (narrow-to-region $begin $end)
-        (progn
-          (goto-char (point-min))
-          (while (re-search-forward "\n\n\n+" nil "move")
-            (replace-match "\n\n")))))))
-
 (defun xah-clean-whitespace ()
   "Delete trailing whitespace, and replace repeated blank lines to just 1.
 Only space and tab is considered whitespace here.
@@ -2068,34 +1554,6 @@ Version 2017-09-22"
             (delete-char -1))))
       (message "white space cleaned"))))
 
-(defun xah-make-backup ()
-  "Make a backup copy of current file or dired marked files.
-If in dired, backup current file or marked files.
-The backup file name is
- ‹name›~‹timestamp›~
-example:
- file.html~20150721T014457~
-in the same dir. If such a file already exist, it's overwritten.
-If the current buffer is not associated with a file, nothing's done.
-URL `http://ergoemacs.org/emacs/elisp_make-backup.html'
-Version 2015-10-14"
-  (interactive)
-  (let (($fname (buffer-file-name)))
-    (if $fname
-        (let (($backup-name
-               (concat $fname "~" (format-time-string "%Y%m%dT%H%M%S") "~")))
-          (copy-file $fname $backup-name t)
-          (message (concat "Backup saved at: " $backup-name)))
-      (if (string-equal major-mode "dired-mode")
-          (progn
-            (mapc (lambda ($x)
-                    (let (($backup-name
-                           (concat $x "~" (format-time-string "%Y%m%dT%H%M%S") "~")))
-                      (copy-file $x $backup-name t)))
-                  (dired-get-marked-files))
-            (message "marked files backed up"))
-        (user-error "buffer not file nor dired")))))
-
 (defun xah-make-backup-and-save ()
   "Backup of current file and save, or backup dired marked files.
 For detail, see `xah-make-backup'.
@@ -2110,54 +1568,6 @@ Version 2015-10-14"
           (save-buffer)))
     (progn
       (xah-make-backup))))
-
-(defun xah-delete-current-file-make-backup (&optional @no-backup-p)
-  "Delete current file, makes a backup~, closes the buffer.
-
-Backup filename is “‹name›~‹date time stamp›~”. Existing file of the same name is overwritten. If the file is not associated with buffer, the backup file name starts with “xx_”.
-
-When `universal-argument' is called first, don't create backup.
-
-URL `http://ergoemacs.org/emacs/elisp_delete-current-file.html'
-Version 2016-07-20"
-  (interactive "P")
-  (let* (
-         ($fname (buffer-file-name))
-         ($buffer-is-file-p $fname)
-         ($backup-suffix (concat "~" (format-time-string "%Y%m%dT%H%M%S") "~")))
-    (if $buffer-is-file-p
-        (progn
-          (save-buffer $fname)
-          (when (not @no-backup-p)
-            (copy-file
-             $fname
-             (concat $fname $backup-suffix)
-             t))
-          (delete-file $fname)
-          (message "Deleted. Backup created at 「%s」." (concat $fname $backup-suffix)))
-      (when (not @no-backup-p)
-        (widen)
-        (write-region (point-min) (point-max) (concat "xx" $backup-suffix))
-        (message "Backup created at 「%s」." (concat "xx" $backup-suffix))))
-    (kill-buffer (current-buffer))))
-
-(defun xah-delete-current-file-copy-to-kill-ring ()
-  "Delete current buffer/file and close the buffer, push content to `kill-ring'.
-URL `http://ergoemacs.org/emacs/elisp_delete-current-file.html'
-Version 2016-09-03"
-  (interactive)
-  (let (($bstr (buffer-string)))
-    (when (> (length $bstr) 0)
-      (kill-new $bstr)
-      (message "Buffer content copied to kill-ring."))
-    (when (buffer-file-name)
-      (when (file-exists-p (buffer-file-name))
-        (progn
-          (delete-file (buffer-file-name))
-          (message "Deleted file: 「%s」." (buffer-file-name)))))
-    (let ((buffer-offer-save nil))
-      (set-buffer-modified-p nil)
-      (kill-buffer (current-buffer)))))
 
 (defun xah-delete-current-file (&optional @no-backup-p)
   "Delete current buffer/file.
@@ -2259,21 +1669,6 @@ Version 2016-10-15"
          (lambda ($fpath) (let ((process-connection-type nil))
                             (start-process "" nil "xdg-open" $fpath))) $file-list))))))
 
-(defun xah-open-in-terminal ()
-  "Open the current dir in a new terminal window.
-URL `http://ergoemacs.org/emacs/emacs_dired_open_file_in_ext_apps.html'
-Version 2015-12-10"
-  (interactive)
-  (cond
-   ((string-equal system-type "windows-nt")
-    (message "Microsoft Windows not supported. File a bug report or pull request."))
-   ((string-equal system-type "darwin")
-    (message "Mac not supported. File a bug report or pull request."))
-   ((string-equal system-type "gnu/linux")
-    (let ((process-connection-type nil))
-      (start-process "" nil "x-terminal-emulator"
-                     (concat "--working-directory=" default-directory) )))))
-
 (defun xah-next-window-or-frame ()
   "Switch to next window or frame.
 If current frame has only one window, switch to next frame.
@@ -2285,14 +1680,6 @@ Version 2017-01-27"
     (if (one-window-p)
         (other-frame 1)
       (other-window 1))))
-
-(defun xah-unplit-window-or-next-frame ()
-  "Unsplit window. If current frame has only one window, switch to next frame.
-Version 2017-01-29"
-  (interactive)
-  (if (one-window-p)
-      (other-frame 1)
-    (delete-other-windows)))
 
 (defun xah-describe-major-mode ()
   "Display inline doc for current `major-mode'."

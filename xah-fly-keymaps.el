@@ -582,6 +582,10 @@ Version 2017-01-21"
   ;;
   )
 
+(defun backward-kill-line
+	"Kills a line backwards from point"
+  (interactive)
+  (kill-line -1))
 
 (defun xah-fly-command-mode-init ()
   "Set command mode keys.
@@ -630,7 +634,8 @@ Version 2017-01-21"
      ("f" . undo)
      ("g" . backward-word)
      ("h" . backward-char)
-     ("i" . xah-delete-current-text-block)
+     ("i" . kill-line)
+	 ("I" . backward-kill-line)
      ("j" . xah-copy-line-or-region)
      ("k" . xah-paste-or-paste-previous)
      ("l" . xah-fly-insert-mode-activate-end-of-line-before)
