@@ -654,7 +654,7 @@ Version 2017-01-21"
      ("y" . set-mark-command)
      ("z" . xah-goto-matching-bracket)))
 
-  (define-key xah-fly-key-map (kbd "a") (if (fboundp 'smex) 'smex 'execute-extended-command ))
+  (define-key xah-fly-key-map (kbd "a") (if (fboundp 'counsel-M-x) 'counsel-M-x (if (fboundp 'smex) 'smex 'execute-extended-command )))
   (when xah-fly-swapped-1-8-and-2-7-p
     (xah-fly--define-keys
      xah-fly-key-map
