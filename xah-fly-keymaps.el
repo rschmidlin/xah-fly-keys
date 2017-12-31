@@ -655,6 +655,7 @@ Version 2017-01-21"
      ("z" . xah-goto-matching-bracket)))
 
   (define-key xah-fly-key-map (kbd "a") (if (fboundp 'counsel-M-x) 'counsel-M-x (if (fboundp 'smex) 'smex 'execute-extended-command )))
+  (define-key xah-fly-key-map (kbd ",") (if (fboundp 'ace-window) 'ace-window 'other-window))
   (when xah-fly-swapped-1-8-and-2-7-p
     (xah-fly--define-keys
      xah-fly-key-map
