@@ -113,6 +113,10 @@
 (when (version<= emacs-version "26.0.50"  )
   (defalias 'global-display-line-numbers-mode 'linum-mode ))
 
+(defvar xah-fly-key-map-alist (list (cons 'xah-fly-keys xah-fly-generic-map)
+									(cons 'xah-fly-command-state-q xah-fly-command-map)
+									(cons 'xah-fly-insert-state-q  xah-fly-insert-map)))
+
 (defvar xah-fly-command-mode-activate-hook nil "Hook for `xah-fly-command-mode-activate'")
 (defvar xah-fly-insert-mode-activate-hook nil "Hook for `xah-fly-insert-mode-activate'")
 
@@ -120,15 +124,24 @@
   "Set a keyboard layout.
 Possible value should be \"qwerty\", \"dvorak\" or \"workman\"
 Version 2017-01-21"
-  (interactive)
+  (interactive "M")
   (setq xah-fly-key--current-layout @layout)
-  (load "xah-fly-keymaps"))
+  (load "xah-fly-keymaps")
+  (xah-fly-command-mode-init)
+  (xah-fly-insert-mode-init))
 
 ;; keymaps
 (defvar xah-fly-swapped-1-8-and-2-7-p nil "If non-nil, it means keys 1 and 8 are swapped, and 2 and 7 are swapped. See: http://xahlee.info/kbd/best_number_key_layout.html")
 
 (defvar xah-fly-insert-state-q t "Boolean value. true means insertion mode is on.")
-(setq xah-fly-insert-state-q t)
+
+(defvar xah-fly-command-state-q t "Boolean value. true means command mode is on.")
+
+(defun xah-fly-set-state (state)
+  "Set the state of xah-fly-keys."
+  (setq xah-fly-insert-state-q nil)
+  (setq xah-fly-command-state-q nil)
+  (set state t))
 
 (defun xah-fly-mode-toggle ()
   "Switch between {insertion, command} modes."
@@ -147,20 +160,26 @@ Version 2017-01-21"
   "Activate command mode and run `xah-fly-command-mode-activate-hook'
 Version 2017-07-07"
   (interactive)
-  (xah-fly-command-mode-init)
+  (xah-fly-set-state 'xah-fly-command-state-q)
+  (modify-all-frames-parameters (list (cons 'cursor-type 'box)))
+  (setq mode-line-front-space "▮")
+  (force-mode-line-update)
   (run-hooks 'xah-fly-command-mode-activate-hook))
 
 (defun xah-fly-command-mode-activate-no-hook ()
   "Activate command mode. Does not run `xah-fly-command-mode-activate-hook'
 Version 2017-07-07"
   (interactive)
-  (xah-fly-command-mode-init))
+  (xah-fly-set-state 'xah-fly-command-state-q))
 
 (defun xah-fly-insert-mode-activate ()
   "Activate insertion mode.
 Version 2017-07-07"
   (interactive)
-  (xah-fly-insert-mode-init)
+  (xah-fly-set-state 'xah-fly-insert-state-q)
+  (modify-all-frames-parameters (list (cons 'cursor-type 'bar)))
+  (setq mode-line-front-space "⌶")
+  (force-mode-line-update)
   (run-hooks 'xah-fly-insert-mode-activate-hook))
 
 (defun xah-fly-insert-mode-activate-newline ()
@@ -207,15 +226,20 @@ Version 2017-10-08"
 (define-minor-mode xah-fly-keys
   "A modal keybinding set, like vim, but based on ergonomic principles, like Dvorak layout.
 URL `http://ergoemacs.org/misc/ergoemacs_vi_mode.html'"
-  t "∑flykeys" xah-fly-key-map
+  t "∑flykeys"
   (progn
+	;; Push mode map-alist
+	(push 'xah-fly-key-map-alist emulation-mode-map-alists)
+	;; initialize keymaps
+	(xah-fly-command-mode-init)
+	(xah-fly-insert-mode-init)
     ;; when going into minibuffer, switch to insertion mode.
     (add-hook 'minibuffer-setup-hook 'xah-fly-insert-mode-activate)
     (add-hook 'minibuffer-exit-hook 'xah-fly-command-mode-activate)
     ;; (add-hook 'xah-fly-command-mode-activate-hook 'xah-fly-save-buffer-if-file)
     ;; when in shell mode, switch to insertion mode.
-    (add-hook 'shell-mode-hook 'xah-fly-insert-mode-activate))
-  (xah-fly-command-mode-activate)
+    (add-hook 'shell-mode-hook 'xah-fly-insert-mode-activate)
+	(xah-fly-command-mode-activate))
   ;; (add-to-list 'emulation-mode-map-alists (list (cons 'xah-fly-keys xah-fly-key-map )))
   ;; (add-to-list 'emulation-mode-map-alists '((cons xah-fly-keys xah-fly-key-map )))
 )
@@ -224,11 +248,12 @@ URL `http://ergoemacs.org/misc/ergoemacs_vi_mode.html'"
   "Turn off xah-fly-keys minor mode."
   (interactive)
   (progn
+	(xah-fly-insert-mode-activate)
+	(setq emulation-mode-map-alists (delete 'xah-fly-key-map-alist emulation-mode-map-alists))
     (remove-hook 'minibuffer-setup-hook 'xah-fly-insert-mode-activate)
     (remove-hook 'minibuffer-exit-hook 'xah-fly-command-mode-activate)
     (remove-hook 'xah-fly-command-mode-activate-hook 'xah-fly-save-buffer-if-file)
     (remove-hook 'shell-mode-hook 'xah-fly-insert-mode-activate))
-  (xah-fly-insert-mode-activate)
   (xah-fly-keys 0))
 
 (provide 'xah-fly-keys)

@@ -1,7 +1,10 @@
 (require 'xah-fly-commands)
 (require 'xah-fly-layouts)
 
-(defvar xah-fly-key-map (make-sparse-keymap) "Keybinding for `xah-fly-keys' minor mode.")
+(defvar xah-fly-command-map (make-sparse-keymap) "Keybinding for `xah-fly-keys' command mode.")
+(defvar xah-fly-generic-map (make-sparse-keymap) "Keybinding for `xah-fly-keys' mode.")
+(defvar xah-fly-insert-map (make-sparse-keymap) "Keybinding for `xah-fly-keys' insert mode.")
+(suppress-keymap xah-fly-command-map 't)
 
 (defvar xah-fly-use-control-key t "if nil, do not bind any control key. When t, standard keys for open, close, paste, are bound.")
 (defvar xah-fly-use-meta-key t "if nil, do not bind any meta key.")
@@ -510,16 +513,16 @@ Version 2017-01-21"
 (progn
 
   (progn
-    (define-key xah-fly-key-map (kbd "<home>") 'xah-fly-command-mode-activate)
-    (define-key xah-fly-key-map (kbd "<menu>") 'xah-fly-command-mode-activate)
-    (define-key xah-fly-key-map (kbd "<f8>") 'xah-fly-command-mode-activate-no-hook)
+    (define-key xah-fly-generic-map (kbd "<home>") 'xah-fly-command-mode-activate)
+    (define-key xah-fly-generic-map (kbd "<menu>") 'xah-fly-command-mode-activate)
+    (define-key xah-fly-generic-map (kbd "<f8>") 'xah-fly-command-mode-activate-no-hook)
 
-    (define-key xah-fly-key-map (kbd "<f9>") xah-fly-leader-key-map)
+    (define-key xah-fly-generic-map (kbd "<f9>") xah-fly-leader-key-map)
 
-    (define-key xah-fly-key-map (kbd "<f11>") 'xah-previous-user-buffer)
-    (define-key xah-fly-key-map (kbd "<f12>") 'xah-next-user-buffer)
-    (define-key xah-fly-key-map (kbd "<C-f11>") 'xah-previous-emacs-buffer)
-    (define-key xah-fly-key-map (kbd "<C-f12>") 'xah-next-emacs-buffer))
+    (define-key xah-fly-generic-map (kbd "<f11>") 'xah-previous-user-buffer)
+    (define-key xah-fly-generic-map (kbd "<f12>") 'xah-next-user-buffer)
+    (define-key xah-fly-generic-map (kbd "<C-f11>") 'xah-previous-emacs-buffer)
+    (define-key xah-fly-generic-map (kbd "<C-f12>") 'xah-next-emacs-buffer))
 
   (progn
     ;; set arrow keys in isearch. left/right is backward/forward, up/down is history. press Return to exit
@@ -536,49 +539,49 @@ Version 2017-01-21"
   ;;
   (when xah-fly-use-control-key
     (progn
-      (define-key xah-fly-key-map (kbd "<C-prior>") 'xah-previous-user-buffer)
-      (define-key xah-fly-key-map (kbd "<C-next>") 'xah-next-user-buffer)
+      (define-key xah-fly-generic-map (kbd "<C-prior>") 'xah-previous-user-buffer)
+      (define-key xah-fly-generic-map (kbd "<C-next>") 'xah-next-user-buffer)
 
-      (define-key xah-fly-key-map (kbd "C-2") 'xah-previous-user-buffer)
-      (define-key xah-fly-key-map (kbd "C-1") 'xah-next-user-buffer)
+      (define-key xah-fly-generic-map (kbd "C-2") 'xah-previous-user-buffer)
+      (define-key xah-fly-generic-map (kbd "C-1") 'xah-next-user-buffer)
 
-      (define-key xah-fly-key-map (kbd "<C-S-prior>") 'xah-previous-emacs-buffer)
-      (define-key xah-fly-key-map (kbd "<C-S-next>") 'xah-next-emacs-buffer)
+      (define-key xah-fly-generic-map (kbd "<C-S-prior>") 'xah-previous-emacs-buffer)
+      (define-key xah-fly-generic-map (kbd "<C-S-next>") 'xah-next-emacs-buffer)
 
-      (define-key xah-fly-key-map (kbd "<C-tab>") 'xah-next-user-buffer)
-      (define-key xah-fly-key-map (kbd "<C-S-tab>") 'xah-previous-user-buffer)
-      (define-key xah-fly-key-map (kbd "<C-S-iso-lefttab>") 'xah-previous-user-buffer)
+      (define-key xah-fly-generic-map (kbd "<C-tab>") 'xah-next-user-buffer)
+      (define-key xah-fly-generic-map (kbd "<C-S-tab>") 'xah-previous-user-buffer)
+      (define-key xah-fly-generic-map (kbd "<C-S-iso-lefttab>") 'xah-previous-user-buffer)
 
-      (define-key xah-fly-key-map (kbd "C-9") 'scroll-down-command)
-      (define-key xah-fly-key-map (kbd "C-0") 'scroll-up-command)
+      (define-key xah-fly-generic-map (kbd "C-9") 'scroll-down-command)
+      (define-key xah-fly-generic-map (kbd "C-0") 'scroll-up-command)
 
-      (define-key xah-fly-key-map (kbd "C-SPC") 'xah-fly-leader-key-map)
+      (define-key xah-fly-generic-map (kbd "C-SPC") 'xah-fly-leader-key-map)
 
-      (define-key xah-fly-key-map (kbd "C-a") 'mark-whole-buffer)
-      (define-key xah-fly-key-map (kbd "C-n") 'xah-new-empty-buffer)
-      (define-key xah-fly-key-map (kbd "C-S-n") 'make-frame-command)
-      (define-key xah-fly-key-map (kbd "C-o") 'find-file)
-      (define-key xah-fly-key-map (kbd "C-s") 'save-buffer)
-      (define-key xah-fly-key-map (kbd "C-S-s") 'write-file)
-      (define-key xah-fly-key-map (kbd "C-S-t") 'xah-open-last-closed)
-      (define-key xah-fly-key-map (kbd "C-v") 'yank)
-      (define-key xah-fly-key-map (kbd "C-w") 'xah-close-current-buffer)
-      (define-key xah-fly-key-map (kbd "C-z") 'undo)
+      (define-key xah-fly-generic-map (kbd "C-a") 'mark-whole-buffer)
+      (define-key xah-fly-generic-map (kbd "C-n") 'xah-new-empty-buffer)
+      (define-key xah-fly-generic-map (kbd "C-S-n") 'make-frame-command)
+      (define-key xah-fly-generic-map (kbd "C-o") 'find-file)
+      (define-key xah-fly-generic-map (kbd "C-s") 'save-buffer)
+      (define-key xah-fly-generic-map (kbd "C-S-s") 'write-file)
+      (define-key xah-fly-generic-map (kbd "C-S-t") 'xah-open-last-closed)
+      (define-key xah-fly-generic-map (kbd "C-v") 'yank)
+      (define-key xah-fly-generic-map (kbd "C-w") 'xah-close-current-buffer)
+      (define-key xah-fly-generic-map (kbd "C-z") 'undo)
 
-      (define-key xah-fly-key-map (kbd "C-3") 'previous-error)
-      (define-key xah-fly-key-map (kbd "C-4") 'next-error)
+      (define-key xah-fly-generic-map (kbd "C-3") 'previous-error)
+      (define-key xah-fly-generic-map (kbd "C-4") 'next-error)
 
-      (define-key xah-fly-key-map (kbd "C-+") 'text-scale-increase)
-      (define-key xah-fly-key-map (kbd "C--") 'text-scale-decrease)
+      (define-key xah-fly-generic-map (kbd "C-+") 'text-scale-increase)
+      (define-key xah-fly-generic-map (kbd "C--") 'text-scale-decrease)
 
-      (define-key xah-fly-key-map (kbd "C-t") nil) ; never do transpose-chars
+      (define-key xah-fly-generic-map (kbd "C-t") nil) ; never do transpose-chars
 
       ;;
       ))
 
   (progn
     (when xah-fly-use-meta-key
-      (define-key xah-fly-key-map (kbd "M-SPC") 'xah-fly-command-mode-activate)))
+      (define-key xah-fly-generic-map (kbd "M-SPC") 'xah-fly-command-mode-activate)))
   ;;
   )
 
@@ -592,7 +595,7 @@ Version 2017-01-21"
 Version 2017-01-21"
   (interactive)
   (xah-fly--define-keys
-   xah-fly-key-map
+   xah-fly-command-map
    '(
      ("~" . nil)
      (":" . nil)
@@ -654,35 +657,27 @@ Version 2017-01-21"
      ("y" . set-mark-command)
      ("z" . xah-goto-matching-bracket)))
 
-  (define-key xah-fly-key-map (kbd "a") (if (fboundp 'counsel-M-x) 'counsel-M-x (if (fboundp 'smex) 'smex 'execute-extended-command )))
-  (define-key xah-fly-key-map (kbd ",") (if (fboundp 'ace-window) 'ace-window 'other-window))
+  (define-key xah-fly-command-map (kbd "a") (if (fboundp 'counsel-M-x) 'counsel-M-x (if (fboundp 'smex) 'smex 'execute-extended-command )))
+  (define-key xah-fly-command-map (kbd ",") (if (fboundp 'ace-window) 'ace-window 'other-window))
   (when xah-fly-swapped-1-8-and-2-7-p
     (xah-fly--define-keys
-     xah-fly-key-map
+     xah-fly-command-map
      '(
        ("8" . pop-global-mark)
        ("7" . xah-pop-local-mark-ring)
        ("2" . xah-select-current-line)
        ("1" . xah-extend-selection))))
-
-  (progn
-    (setq xah-fly-insert-state-q nil )
-    (modify-all-frames-parameters (list (cons 'cursor-type 'box))))
-
-  (setq mode-line-front-space "▮")
-  (force-mode-line-update)
-
   ;;
   )
 
 (defun xah-fly-insert-mode-init ()
   "Set insertion mode keys"
   (interactive)
-  ;; (setq xah-fly-key-map (make-sparse-keymap))
-  ;; (setq xah-fly-key-map (make-keymap))
+  ;; (setq xah-fly-key-insert-map (make-sparse-keymap))
+  ;; (setq xah-fly-key-insert-map (make-keymap))
 
   (xah-fly--define-keys
-   xah-fly-key-map
+   xah-fly-insert-map
    '(
 
      ("SPC" . nil)
@@ -744,14 +739,6 @@ Version 2017-01-21"
 
      ;;
      ))
-
-  (progn
-    (setq xah-fly-insert-state-q t )
-    (modify-all-frames-parameters (list (cons 'cursor-type 'bar))))
-
-(setq mode-line-front-space "⌶")
-(force-mode-line-update)
-
   ;;
 )
 
