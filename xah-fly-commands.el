@@ -646,7 +646,7 @@ Version 2017-01-11"
           (replace-match "\\\"" "FIXEDCASE" "LITERAL")))))
 
 (defun xah-cycle-hyphen-underscore-space ( &optional @begin @end )
-  "Cycle {underscore, space, hypen} chars in selection or inside quote/bracket or line.
+  "Cycle {underscore, space, hyphen} chars in selection or inside quote/bracket or line.
 When called repeatedly, this command cycles the {“_”, “-”, “ ”} characters, in that order.
 
 The region to work on is by this order:
@@ -1408,7 +1408,7 @@ If there is text selection, uses the text selection for path.
 If the path starts with “http://”, open the URL in browser.
 Input path can be {relative, full path, URL}.
 Path may have a trailing “:‹n›” that indicates line number. If so, jump to that line number.
-If path does not have a file extention, automatically try with “.el” for elisp files.
+If path does not have a file extension, automatically try with “.el” for elisp files.
 This command is similar to `find-file-at-point' but without prompting for confirmation.
 
 URL `http://ergoemacs.org/emacs/emacs_open_file_path_fast.html'

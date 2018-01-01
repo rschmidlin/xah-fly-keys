@@ -75,7 +75,7 @@
 
 ;; globally, the leader key is the 【f9】 key. 【f9】 is leader key regardless it's in command mode or insert mode.
 
-;; the following stardard keys with Control are supported:
+;; the following standard keys with Control are supported:
 
  ;; 【Ctrl+tab】 'xah-next-user-buffer
  ;; 【Ctrl+shift+tab】 'xah-previous-user-buffer
@@ -86,7 +86,7 @@
  ;; 【Ctrl+o】 open
  ;; 【Ctrl+s】 save
  ;; 【Ctrl+shift+s】 save as
- ;; 【Ctrl+shift+t】 open last clased
+ ;; 【Ctrl+shift+t】 open last closed
  ;; 【Ctrl++】 'text-scale-increase
  ;; 【Ctrl+-】 'text-scale-decrease
  ;; 【Ctrl+0】 (lambda () (interactive) (text-scale-set 0))))
@@ -170,7 +170,10 @@ Version 2017-07-07"
   "Activate command mode. Does not run `xah-fly-command-mode-activate-hook'
 Version 2017-07-07"
   (interactive)
-  (xah-fly-set-state 'xah-fly-command-state-q))
+  (xah-fly-set-state 'xah-fly-command-state-q)
+  (modify-all-frames-parameters (list (cons 'cursor-type 'box)))
+  (setq mode-line-front-space "▮")
+  (force-mode-line-update))
 
 (defun xah-fly-insert-mode-activate ()
   "Activate insertion mode.
