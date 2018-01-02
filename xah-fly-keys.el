@@ -251,12 +251,12 @@ URL `http://ergoemacs.org/misc/ergoemacs_vi_mode.html'"
   "Turn off xah-fly-keys minor mode."
   (interactive)
   (progn
-	(xah-fly-insert-mode-activate)
 	(setq emulation-mode-map-alists (delete 'xah-fly-key-map-alist emulation-mode-map-alists))
     (remove-hook 'minibuffer-setup-hook 'xah-fly-insert-mode-activate)
     (remove-hook 'minibuffer-exit-hook 'xah-fly-command-mode-activate)
     (remove-hook 'xah-fly-command-mode-activate-hook 'xah-fly-save-buffer-if-file)
     (remove-hook 'shell-mode-hook 'xah-fly-insert-mode-activate))
+  (xah-fly-insert-mode-activate)
   (xah-fly-keys 0))
 
 (provide 'xah-fly-keys)

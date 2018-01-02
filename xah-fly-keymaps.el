@@ -581,7 +581,7 @@ Version 2017-01-21"
 
   (progn
     (when xah-fly-use-meta-key
-      (define-key xah-fly-generic-map (kbd "M-SPC") 'xah-fly-command-mode-activate)))
+      (define-key xah-fly-generic-map (kbd "M-SPC") 'xah-fly-command-mode-activate-no-hook)))
   ;;
   )
 
