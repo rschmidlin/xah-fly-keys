@@ -242,7 +242,7 @@ URL `http://ergoemacs.org/misc/ergoemacs_vi_mode.html'"
     ;; (add-hook 'xah-fly-command-mode-activate-hook 'xah-fly-save-buffer-if-file)
     ;; when in shell mode, switch to insertion mode.
     (add-hook 'shell-mode-hook 'xah-fly-insert-mode-activate)
-	(xah-fly-command-mode-activate))
+  (xah-fly-command-mode-activate))
   ;; (add-to-list 'emulation-mode-map-alists (list (cons 'xah-fly-keys xah-fly-key-map )))
   ;; (add-to-list 'emulation-mode-map-alists '((cons xah-fly-keys xah-fly-key-map )))
 )
