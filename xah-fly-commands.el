@@ -497,6 +497,64 @@ Version 2017-07-15"
           (xah-reformat-whitespaces-to-one-space $p1 $p2)))
       (put this-command 'is-longline-p (not is-longline-p)))))
 
+(defun xah-reformat-whitespaces-to-one-space (@begin @end)
+  "Replace whitespaces by one space.
+
+URL `http://ergoemacs.org/emacs/emacs_reformat_lines.html'
+Version 2017-01-11"
+  (interactive "r")
+  (save-excursion
+    (save-restriction
+      (narrow-to-region @begin @end)
+      (goto-char (point-min))
+      (while
+          (search-forward "\n" nil "move")
+        (replace-match " "))
+      (goto-char (point-min))
+      (while
+          (search-forward "\t" nil "move")
+        (replace-match " "))
+      (goto-char (point-min))
+      (while
+          (re-search-forward "  +" nil "move")
+        (replace-match " ")))))
+
+(defun xah-reformat-to-multi-lines ( &optional @begin @end @min-length)
+  "Replace spaces by a newline at places so lines are not long.
+When there is a text selection, act on the selection, else, act on a text block separated by blank lines.
+
+If `universal-argument' is called first, use the number value for min length of line. By default, it's 70.
+
+URL `http://ergoemacs.org/emacs/emacs_reformat_lines.html'
+Version 2017-07-06"
+  (interactive )
+  (let (
+        $p1 $p2
+        ($blanks-regex "\n[ \t]*\n")
+        ($minlen (if @min-length
+                     @min-length
+                   (if current-prefix-arg (prefix-numeric-value current-prefix-arg) 70 ))))
+    (if (and  @begin @end)
+        (setq $p1 @begin $p2 @end)
+      (if (region-active-p)
+          (progn (setq $p1 (region-beginning) $p2 (region-end)))
+        (save-excursion
+          (if (re-search-backward $blanks-regex nil "move")
+              (progn (re-search-forward $blanks-regex)
+                     (setq $p1 (point)))
+            (setq $p1 (point)))
+          (if (re-search-forward $blanks-regex nil "move")
+              (progn (re-search-backward $blanks-regex)
+                     (setq $p2 (point)))
+            (setq $p2 (point))))))
+    (save-restriction
+      (narrow-to-region $p1 $p2)
+      (goto-char (point-min))
+      (while
+          (re-search-forward " +" nil "move")
+        (when (> (- (point) (line-beginning-position)) $minlen)
+          (replace-match "\n" ))))))
+
 (defun xah-space-to-newline ()
   "Replace space sequence to a newline char.
 Works on current block or selection.
@@ -1092,6 +1150,19 @@ Version 2017-01-17"
 
 ;; text selection
 
+(defun xah-select-current-block ()
+  "Select the current block of text between blank lines.
+
+URL `http://ergoemacs.org/emacs/modernization_mark-word.html'
+Version 2017-07-02"
+  (interactive)
+  (progn
+    (skip-chars-forward " \n\t")
+    (when (re-search-backward "\n[ \t]*\n" nil "move")
+      (re-search-forward "\n[ \t]*\n"))
+    (push-mark (point) t t)
+    (re-search-forward "\n[ \t]*\n" nil "move")))
+
 (defun xah-select-block ()
   "Select the current/next block of text between blank lines.
 If region is active, extend selection downward by block.
@@ -1554,6 +1625,34 @@ Version 2017-09-22"
             (delete-char -1))))
       (message "white space cleaned"))))
 
+(defun xah-make-backup ()
+  "Make a backup copy of current file or dired marked files.
+If in dired, backup current file or marked files.
+The backup file name is
+  name ~ timestamp ~
+example:
+ file.html~20150721T014457~
+in the same dir. If such a file already exist, it's overwritten.
+If the current buffer is not associated with a file, nothing's done.
+URL `http://ergoemacs.org/emacs/elisp_make-backup.html'
+Version 2015-10-14"
+  (interactive)
+  (let (($fname (buffer-file-name)))
+    (if $fname
+        (let (($backup-name
+               (concat $fname "~" (format-time-string "%Y%m%dT%H%M%S") "~")))
+          (copy-file $fname $backup-name t)
+          (message (concat "Backup saved at: " $backup-name)))
+      (if (string-equal major-mode "dired-mode")
+          (progn
+            (mapc (lambda ($x)
+                    (let (($backup-name
+                           (concat $x "~" (format-time-string "%Y%m%dT%H%M%S") "~")))
+                      (copy-file $x $backup-name t)))
+                  (dired-get-marked-files))
+            (message "marked files backed up"))
+        (user-error "buffer not file nor dired")))))
+
 (defun xah-make-backup-and-save ()
   "Backup of current file and save, or backup dired marked files.
 For detail, see `xah-make-backup'.
@@ -1568,6 +1667,54 @@ Version 2015-10-14"
           (save-buffer)))
     (progn
       (xah-make-backup))))
+
+(defun xah-delete-current-file-make-backup (&optional @no-backup-p)
+  "Delete current file, makes a backup~, closes the buffer.
+
+Backup filename is   name ~ date time stamp ~ . Existing file of the same name is overwritten. If the file is not associated with buffer, the backup file name starts with  xx_ .
+
+When `universal-argument' is called first, don't create backup.
+
+URL `http://ergoemacs.org/emacs/elisp_delete-current-file.html'
+Version 2016-07-20"
+  (interactive "P")
+  (let* (
+         ($fname (buffer-file-name))
+         ($buffer-is-file-p $fname)
+         ($backup-suffix (concat "~" (format-time-string "%Y%m%dT%H%M%S") "~")))
+    (if $buffer-is-file-p
+        (progn
+          (save-buffer $fname)
+          (when (not @no-backup-p)
+            (copy-file
+             $fname
+             (concat $fname $backup-suffix)
+             t))
+          (delete-file $fname)
+          (message "Deleted. Backup created at  %s ." (concat $fname $backup-suffix)))
+      (when (not @no-backup-p)
+        (widen)
+        (write-region (point-min) (point-max) (concat "xx" $backup-suffix))
+        (message "Backup created at  %s ." (concat "xx" $backup-suffix))))
+    (kill-buffer (current-buffer))))
+
+(defun xah-delete-current-file-copy-to-kill-ring ()
+  "Delete current buffer/file and close the buffer, push content to `kill-ring'.
+URL `http://ergoemacs.org/emacs/elisp_delete-current-file.html'
+Version 2016-09-03"
+  (interactive)
+  (let (($bstr (buffer-string)))
+    (when (> (length $bstr) 0)
+      (kill-new $bstr)
+      (message "Buffer content copied to kill-ring."))
+    (when (buffer-file-name)
+      (when (file-exists-p (buffer-file-name))
+        (progn
+          (delete-file (buffer-file-name))
+          (message "Deleted file:  %s ." (buffer-file-name)))))
+    (let ((buffer-offer-save nil))
+      (set-buffer-modified-p nil)
+      (kill-buffer (current-buffer)))))
 
 (defun xah-delete-current-file (&optional @no-backup-p)
   "Delete current buffer/file.
