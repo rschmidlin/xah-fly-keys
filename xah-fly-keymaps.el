@@ -638,7 +638,6 @@ Version 2017-01-21"
      ("g" . backward-word)
      ("h" . backward-char)
      ("i" . kill-line)
-	 ("I" . backward-kill-line)
      ("j" . xah-copy-line-or-region)
      ("k" . xah-paste-or-paste-previous)
      ("l" . xah-fly-insert-mode-activate-end-of-line-before)
